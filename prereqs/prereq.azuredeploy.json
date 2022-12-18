@@ -125,7 +125,7 @@
                             "properties": {     
                                 "storageKey": "?",
                                 "storageKeyType": "SharedAccessKey",                                                           
-                                "storageUri": "https://mppublicstorage.blob.core.windows.net/publicsap/db.bacpac",
+                                "storageUri": "https://github.com/DBAFahim/saptable-adf-starter_fahmad/blob/a65f38f0db0010764cfc090aa86d58ee89e3f8fa/data/db.bacpac",
                                 "administratorLogin": "[parameters('databaseAdminUsername')]",
                                 "administratorLoginPassword": "[parameters('databaseAdminPassword')]",
                                 "operationMode": "Import"
