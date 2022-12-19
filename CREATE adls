@@ -2,7 +2,7 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
         "variables": {
-			"storageAccountName": "[adlstcgclaritydws]"
+			"storageAccountName": "adlstcgclaritydws"
 		},
     "resources": [
         {
@@ -12,9 +12,12 @@
           "sku": {
               "name": "Standard_LRS"
           },
-          "location": "[East US 2]",
+          "location": "East US 2",
           "kind": "StorageV2",
-          "resources": [
+          "properties": {
+			  "supportsHttpsTrafficOnly": "True"
+		  },
+		  "resources": [
               {
                   "type": "blobServices",
                   "name": "default",
@@ -38,4 +41,3 @@
       }
 	]
 }
-
