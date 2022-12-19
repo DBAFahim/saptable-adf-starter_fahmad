@@ -1,96 +1,80 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
-    
     "parameters": {
-        "databaseAdminUsername": {
+        "sqlAdministratorLogin": {
             "type": "string",
             "metadata": {
-                "description": "Username for sqldb-tcg-clarity-dws Admin"
+                "description": "The administrator username of the SQL Server."
             }
-    "bacpac_path": {
-                "type": "string",
-                "defaultValue": "https://adlstcgclaritydws.blob.core.windows.net/install?sp=r&st=2022-12-19T03:07:17Z&se=2022-12-19T11:07:17Z&spr=https&sv=2021-06-08&sr=c&sig=jF413avm7vZysG6Vpe3yPvZLq%2F8XEo6zXU%2BYzHW2xn0%3D/DB.bacpac",
-                "metadata": {
-                    "description": "public path to the bacpac file to import"
-                }
-            }
-    },
-        "databaseAdminPassword": {
+        },
+        "sqlAdministratorLoginPassword": {
             "type": "securestring",
             "metadata": {
-                "description": "Password for sqldb-tcg-clarity-dws Admin"
+                "description": "The administrator password of the SQL Server."
+            }
+        },
+        "transparentDataEncryption": {
+            "type": "string",
+            "allowedValues": [
+                "Enabled",
+                "Disabled"
+            ],
+            "defaultValue": "Enabled",
+            "metadata": {
+                "description": "Enable or disable Transparent Data Encryption (TDE) for the database."
             }
         },
         "location": {
             "type": "string",
-            "defaultValue": "East US 2",
+            "defaultValue": "[resourceGroup().location]",
             "metadata": {
                 "description": "Location for all resources."
             }
-        },
-        "variables": {
-            "storageAccountName": "[concat(uniqueString(resourceGroup().id),'storage')]",
-            "SQLServerName": "sqlsrv-tcg-clarity-dws-dev",
-            "databaseName": "sqldb-tcg-clarity-dws",
-            "databaseCollation": "SQL_Latin1_General_CP1_CI_AS",
-            "databaseEdition": "Basic",
-            "databaseRequestedServiceObjectiveName": "Basic"
-        },
-        "resources": [
-            {
-                "name": "[variables('SQLServerName')]",
-                "type": "Microsoft.Sql/servers",
-                "location": "[parameters('location')]",
-                "apiVersion": "2017-10-01-preview",
-                "dependsOn": [],
-                "tags": {
-                    "displayName": "server"
-                },
-                "properties": {
-                    "administratorLogin": "[parameters('databaseAdminUsername')]",
-                    "administratorLoginPassword": "[parameters('databaseAdminPassword')]"
-                },
-                "resources": [
-                    {
-                        "name": "AllowAllWindowsAzureIps",
-                        "type": "firewallrules",
-                        "location": "[parameters('location')]",
-                        "apiVersion": "2017-10-01-preview",
-                        "dependsOn": [
-                            "[resourceId('Microsoft.Sql/servers', variables('SQLServerName'))]"
-                        ],
-                        "properties": {
-                            "startIpAddress": "0.0.0.0",
-                            "endIpAddress": "0.0.0.0"
-                        }
+        }
+    },
+    "variables": {
+        "sqlServerName": "sqlsrv-tcg-clarity-dws-dev",
+        "databaseName": "sqldb-tcg-clarity-dws",
+        "databaseEdition": "Basic",
+        "databaseCollation": "SQL_Latin1_General_CP1_CI_AS",
+        "databaseServiceObjectiveName": "Basic",
+		"bacpac_path": "https://adlstcgclaritydws.blob.core.windows.net/install?sp=r&st=2022-12-19T03:07:17Z&se=2022-12-19T11:07:17Z&spr=https&sv=2021-06-08&sr=c&sig=jF413avm7vZysG6Vpe3yPvZLq%2F8XEo6zXU%2BYzHW2xn0%3D/DB.bacpac"
+
+    },
+    "resources": [
+        {
+            "name": "[variables('sqlServerName')]",
+            "type": "Microsoft.Sql/servers",
+            "apiVersion": "2020-02-02-preview",
+            "location": "[parameters('location')]",
+            "tags": {
+                "displayName": "SqlServer"
+            },
+            "properties": {
+                "administratorLogin": "[parameters('sqlAdministratorLogin')]",
+                "administratorLoginPassword": "[parameters('sqlAdministratorLoginPassword')]",
+                "version": "12.0"
+            },
+            "resources": [
+                {
+                    "name": "[variables('databaseName')]",
+                    "type": "databases",
+                    "apiVersion": "2020-02-02-preview",
+                    "location": "[parameters('location')]",
+                    "tags": {
+                        "displayName": "Database"
                     },
-                    {
-                        "name": "[variables('databaseName')]",
-                        "type": "databases",
-                        "location": "[parameters('location')]",
-                        "apiVersion": "2017-10-01-preview",
-                        "dependsOn": [
-                            "[resourceId('Microsoft.Sql/servers', variables('SQLServerName'))]"
-                        ],
-                        "tags": {
-                            "displayName": "database"
-                        },
-                        "properties": {
-                            "collation": "[variables('databaseCollation')]",
-                            "maxSizeBytes": "1073741824",
-                            "requestedServiceObjectiveName": "[variables('databaseRequestedServiceObjectiveName')]",
-                            "licenseType": "LicenseIncluded",
-                            "readScale": "Disabled",
-                            "readReplicaCount": 0,
-                            "minCapacity": "0.5",
-                            "autoPauseDelay": "60"
-                        },
-                        "sku": {
-                            "name": "GP_S_Gen5_2",
-                            "tier": "GeneralPurpose"
-                        },
-                        "resources": [
+                    "properties": {
+                        "edition": "[variables('databaseEdition')]",
+                        "collation": "[variables('databaseCollation')]",
+                        "requestedServiceObjectiveName": "[variables('databaseServiceObjectiveName')]",
+						"autoPauseDelay": "60"
+                    },
+                    "dependsOn": [
+                        "[variables('sqlServerName')]"
+                    ],
+                    "resources": [
                             {
                                 "name": "Import",
                                 "type": "extensions",
@@ -108,9 +92,31 @@
                                 }
                             }
                         ]
-                    }
-                ]
-            }
-        ]
+                },
+                {
+                    "name": "AllowAllMicrosoftAzureIps",
+                    "type": "firewallrules",
+                    "apiVersion": "2020-02-02-preview",
+                    "location": "[parameters('location')]",
+                    "properties": {
+                        "endIpAddress": "0.0.0.0",
+                        "startIpAddress": "0.0.0.0"
+                    },
+                    "dependsOn": [
+                        "[variables('sqlServerName')]"
+                    ]
+                }
+            ]
+        }
+    ],
+    "outputs": {
+        "sqlServerFqdn": {
+            "type": "string",
+            "value": "[reference(resourceId('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName]"
+        },
+        "databaseName": {
+            "type": "string",
+            "value": "[variables('databaseName')]"
+        }
     }
 }
