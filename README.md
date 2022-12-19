@@ -1,4 +1,4 @@
-[![Deploy To Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FDBAFahim%2Fsaptable-adf-starter_fahmad%2Fdevinstall%2Fazuredeploy.json)
+[![Deploy To Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FDBAFahim%2Fsaptable-adf-starter_fahmad%2Fadfonly%2Fazuredeploy.json)
 
 
 This template creates an Azure Data Factory that ingests data from a configurable list of SAP table entities into Azure Blob Storage. When you deploy this Azure Resource Manager template, the following entities get created: 
