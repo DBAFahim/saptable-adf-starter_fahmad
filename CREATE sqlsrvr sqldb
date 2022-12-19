@@ -1,0 +1,115 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "databaseAdminUsername": {
+            "type": "string",
+            "metadata": {
+                "description": "Username for sqldb-tcg-clarity-dws Admin"
+            }
+        },
+        "databaseAdminPassword": {
+            "type": "securestring",
+            "metadata": {
+                "description": "Password for sqldb-tcg-clarity-dws Admin"
+            }
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "East US 2",
+            "metadata": {
+                "description": "Location for all resources."
+            },
+            "bacpac_path": {
+                "type": "string",
+                "defaultValue": "https://adlstcgclaritydws.blob.core.windows.net/install?sp=r&st=2022-12-19T03:07:17Z&se=2022-12-19T11:07:17Z&spr=https&sv=2021-06-08&sr=c&sig=jF413avm7vZysG6Vpe3yPvZLq%2F8XEo6zXU%2BYzHW2xn0%3D/DB.bacpac",
+                "metadata": {
+                    "description": "public path to the bacpac file to import"
+                }
+            }
+        },
+        "variables": {
+            "storageAccountName": "[concat(uniqueString(resourceGroup().id),'storage')]",
+            "SQLServerName": "sqlsrv-tcg-clarity-dws-dev",
+            "databaseName": "sqldb-tcg-clarity-dws",
+            "databaseCollation": "SQL_Latin1_General_CP1_CI_AS",
+            "databaseEdition": "Basic",
+            "databaseRequestedServiceObjectiveName": "Basic"
+        },
+        "resources": [
+            {
+                "name": "[variables('SQLServerName')]",
+                "type": "Microsoft.Sql/servers",
+                "location": "[parameters('location')]",
+                "apiVersion": "2017-10-01-preview",
+                "dependsOn": [],
+                "tags": {
+                    "displayName": "server"
+                },
+                "properties": {
+                    "administratorLogin": "[parameters('databaseAdminUsername')]",
+                    "administratorLoginPassword": "[parameters('databaseAdminPassword')]"
+                },
+                "resources": [
+                    {
+                        "name": "AllowAllWindowsAzureIps",
+                        "type": "firewallrules",
+                        "location": "[parameters('location')]",
+                        "apiVersion": "2017-10-01-preview",
+                        "dependsOn": [
+                            "[resourceId('Microsoft.Sql/servers', variables('SQLServerName'))]"
+                        ],
+                        "properties": {
+                            "startIpAddress": "0.0.0.0",
+                            "endIpAddress": "0.0.0.0"
+                        }
+                    },
+                    {
+                        "name": "[variables('databaseName')]",
+                        "type": "databases",
+                        "location": "[parameters('location')]",
+                        "apiVersion": "2017-10-01-preview",
+                        "dependsOn": [
+                            "[resourceId('Microsoft.Sql/servers', variables('SQLServerName'))]"
+                        ],
+                        "tags": {
+                            "displayName": "database"
+                        },
+                        "properties": {
+                            "collation": "[variables('databaseCollation')]",
+                            "maxSizeBytes": "1073741824",
+                            "requestedServiceObjectiveName": "[variables('databaseRequestedServiceObjectiveName')]",
+                            "licenseType": "LicenseIncluded",
+                            "readScale": "Disabled",
+                            "readReplicaCount": 0,
+                            "minCapacity": "0.5",
+                            "autoPauseDelay": "60"
+                        },
+                        "sku": {
+                            "name": "GP_S_Gen5_2",
+                            "tier": "GeneralPurpose"
+                        },
+                        "resources": [
+                            {
+                                "name": "Import",
+                                "type": "extensions",
+                                "apiVersion": "2014-04-01-preview",
+                                "dependsOn": [
+                                    "[resourceId('Microsoft.Sql/servers/databases', variables('SQLServerName'), variables('databaseName'))]"
+                                ],
+                                "properties": {
+                                    "storageKey": "?",
+                                    "storageKeyType": "SharedAccessKey",
+                                    "storageUri": "[parameters('bacpac_path')]",
+                                    "administratorLogin": "[parameters('databaseAdminUsername')]",
+                                    "administratorLoginPassword": "[parameters('databaseAdminPassword')]",
+                                    "operationMode": "Import"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}
