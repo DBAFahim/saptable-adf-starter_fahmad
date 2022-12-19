@@ -4,7 +4,7 @@
     "parameters": {
         "dataFactoryLocation": {
             "type": "string",
-            "defaultValue": "South Central US",
+            "defaultValue": "US East 2",
             "metadata": {
                 "description": "Location of the data factory."
             }
