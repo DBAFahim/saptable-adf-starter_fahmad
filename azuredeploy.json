@@ -16,8 +16,8 @@
           }     
     },
     "variables": {
-        "prereqs_link": "https://raw.githubusercontent.com/DBAFahim/saptable-adf-starter_fahmad/devinstall/prereqs/prereq.azuredeploy.json",
-        "adf_link": "https://raw.githubusercontent.com/DBAFahim/saptable-adf-starter_fahmad/devinstall/adfdeploy.json"        
+        "prereqs_link": "https://raw.githubusercontent.com/DBAFahim/saptable-adf-starter_fahmad/adfonly/prereqs/prereq.azuredeploy.json",
+        "adf_link": "https://raw.githubusercontent.com/DBAFahim/saptable-adf-starter_fahmad/adfonly/adfdeploy.json"        
     },
     "resources": [
  
