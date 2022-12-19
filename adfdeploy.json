@@ -4,7 +4,7 @@
     "parameters": {
         "dataFactoryLocation": {
             "type": "string",
-            "defaultValue": "US East 2",
+            "defaultValue": "eastus2",
             "metadata": {
                 "description": "Location of the data factory."
             }
@@ -23,7 +23,7 @@
         }
     },
     "variables": {
-        "factoryName": "[concat('factory', uniqueString(resourceGroup().id))]",
+        "factoryName": "adf-tcg-clarity-dws-dev",
         "factoryId": "[concat('Microsoft.DataFactory/factories/', variables('factoryName'))]"
     },
     "resources": [
