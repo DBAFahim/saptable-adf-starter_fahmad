@@ -1,13 +1,21 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
+    
     "parameters": {
         "databaseAdminUsername": {
             "type": "string",
             "metadata": {
                 "description": "Username for sqldb-tcg-clarity-dws Admin"
             }
-        },
+    "bacpac_path": {
+                "type": "string",
+                "defaultValue": "https://adlstcgclaritydws.blob.core.windows.net/install?sp=r&st=2022-12-19T03:07:17Z&se=2022-12-19T11:07:17Z&spr=https&sv=2021-06-08&sr=c&sig=jF413avm7vZysG6Vpe3yPvZLq%2F8XEo6zXU%2BYzHW2xn0%3D/DB.bacpac",
+                "metadata": {
+                    "description": "public path to the bacpac file to import"
+                }
+            }
+    },
         "databaseAdminPassword": {
             "type": "securestring",
             "metadata": {
@@ -19,13 +27,6 @@
             "defaultValue": "East US 2",
             "metadata": {
                 "description": "Location for all resources."
-            },
-            "bacpac_path": {
-                "type": "string",
-                "defaultValue": "https://adlstcgclaritydws.blob.core.windows.net/install?sp=r&st=2022-12-19T03:07:17Z&se=2022-12-19T11:07:17Z&spr=https&sv=2021-06-08&sr=c&sig=jF413avm7vZysG6Vpe3yPvZLq%2F8XEo6zXU%2BYzHW2xn0%3D/DB.bacpac",
-                "metadata": {
-                    "description": "public path to the bacpac file to import"
-                }
             }
         },
         "variables": {
